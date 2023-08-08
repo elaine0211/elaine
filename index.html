@@ -5,25 +5,62 @@
 </head>
 <body>
     <h1>聯絡我們+粉絲團數位服務</h1>
-<!-- modify this form HTML and place wherever you want your form -->
-<form action="https://formspree.io/f/mnqkpqjb" method="post">
+<!-- form -->
+<form id="my-form" action="https://formspree.io/f/mnqkpqjb" method="post">
         <label for="name">姓名：</label>
         <input type="text" id="name" name="name" required><br><br>
         
-        <label for="email">郵件地址：</label>
+        <label for="email">e-mail：</label>
         <input type="email" id="email" name="email" required><br><br>
-        
-        <label for="message">訊息：</label><br>
+
+    <label for="file">文件上傳：</label>
+    <input type="file" name="upload"> <br><br>
+	
+        <label for="message">內容：</label><br>
         <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
         
-        <input type="submit" value="寄送郵件">
+        <button id="my-form-button">送出</button>
+  <p id="my-form-status"></p>
     </form>
+	
+<!-- script at the end of the body tag -->
+<script>
+    var form = document.getElementById("my-form");
+    
+    async function handleSubmit(event) {
+      event.preventDefault();
+      var status = document.getElementById("my-form-status");
+      var data = new FormData(event.target);
+      fetch(event.target.action, {
+        method: form.method,
+        body: data,
+        headers: {
+            'Accept': 'application/json'
+        }
+      }).then(response => {
+        if (response.ok) {
+          status.innerHTML = "收到您的意見了，我們會儘快回覆您!若適逢連假假期，客服將於收假後依序回覆。謝謝您耐心的等候。";
+          form.reset()
+        } else {
+          response.json().then(data => {
+            if (Object.hasOwn(data, 'errors')) {
+              status.innerHTML = data["errors"].map(error => error["message"]).join(", ")
+            } else {
+              status.innerHTML = "錯誤！ 送出表單時出現問題!"
+            }
+          })
+        }
+      }).catch(error => {
+        status.innerHTML = "錯誤！ 送出表單時出現問題!"
+      });
+    }
+    form.addEventListener("submit", handleSubmit)
+</script>
 
-
-<!-- Messenger 洽談外掛程式 Code -->
+<!-- Messenger  Code -->
     <div id="fb-root"></div>
 
-    <!-- Your 洽談外掛程式 code -->
+    <!-- Id code -->
     <div id="fb-customer-chat" class="fb-customerchat">
     </div>
 
@@ -33,7 +70,7 @@
       chatbox.setAttribute("attribution", "biz_inbox");
     </script>
 
-    <!-- Your SDK code -->
+    <!-- SDK code -->
     <script>
       window.fbAsyncInit = function() {
         FB.init({
